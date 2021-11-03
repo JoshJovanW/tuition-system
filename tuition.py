@@ -1,5 +1,7 @@
 staffId = 'staff' #Hard-coded staff Id and Password
 staffPw = '12345'
+loggedinAs = ''
+studentKey = ''
 
 def searchStudentPayment():
     print("\nSearch for payment made by Student\n"+"-"*30)
@@ -54,6 +56,7 @@ def staffUpdateStudent():
     studentFile = open("student.txt", "r")
     studentFileLine = studentFile.readlines()           #studentFile.readlines() turns "student.txt" into a list containing each lines
     print("Student Subject = " + order[7])
+
 
     newSubjects = input("\nEnter new subjects: ")
     studentFileLine[line-1] = studentData[0]+"|"+studentData[1]+"|"+studentData[2]+"|"+studentData[3]+"|"+studentData[4]+"|"+studentData[5]+"|"+str(studentData[6])+"|"+newSubjects+"\n"
@@ -121,12 +124,13 @@ def staffRegisterTutor():
             staffMenu()
 
 def staffMenu():
+    global loggedinAs
     print("\nWelcome to Staff Menu\n" + "-" * 25)
-    inp = 69
+    inp = 10
     while (inp < 0 or inp >4):  #Infinite loop, unless user inputs value 0-4
-        inp = int(input("Select a Staff Menu: \n0. Go back to Main Menu\n1. Register a tutor \n2. Register a student\n3. Update a student subject\n4. Search Payment made by Student\n"))
+        inp = int(input("Select a Staff Menu: \n0. Log Out\n1. Register a tutor \n2. Register a student\n3. Update a student subject\n4. Search Payment made by Student\n"))
     if inp == 0:
-        mainMenu()
+        loggedinAs = ''
     elif inp == 1:
         staffRegisterTutor()
     elif inp == 2:
@@ -135,66 +139,163 @@ def staffMenu():
         staffUpdateStudent()
     elif inp == 4:
         searchStudentPayment()
+    
 
 
 def staffLogin():
+    global loggedinAs
+
     # Note: staffId and staffPw is hard-coded, staffId = 'staff' and staffPw = '12345'
     print("\nStaff Login, Enter 0 in Staff login ID to go back to Main Menu\n" + "-"*62)
     inpId = inpPw = ''
-    login = False
     while True:  #This while loop looops forever unless the user enters the correct staff login ID and Password OR the user enters '0' in Staff Login ID
         inpId = input("Enter Staff login ID: ")
         inpPw = input("Enter Staff password: ")
         if(inpId == staffId and inpPw == staffPw):  #If the login ID and Password input correct, while loop will be broken and 'login' variabel is set to True
-            login = True
+            loggedinAs = 'staff'
+            print("\nStaff login succesfull~")
+            staffMenu()
             break
         elif(inpId == "0"):  #If user enters '0', while loop will be broken, but 'login' variable is set to False by default
             break
         else:
             print("\nIncorrect ID or Password, Please try again~\n")
-    if (login):  #If the 'login' variable is True, user will be directed to staffMenu
-        print("\nStaff login succesfull~")
-        staffMenu()
-    else:  #If user enters '0' instead, user will be directed to main menu
-        mainMenu()
-
-def mainMenu():
-    print("\nMain Menu\n"+"-"*9)
-    try:
-        inp = 69
-        while (inp < 1 or inp > 2):  #This loops forever unless the user input 1-2
-            inp = int(input("Enter a number: \n1. Staff Login\n"))
-        if inp == 1:
-            staffLogin()
-    except:
-        print("\nInvalid Input Detected")
-        mainMenu()
 
 def studentLogin():
+    global loggedinAs
+    global studentKey
+
     print("\nStudent Login, Enter EXIT in studentName to go back to Main Menu\n" + "-"*62)
 
+    inputName = input("What is your name? \n")
+    if inputName == "EXIT":
+        loggedinAs = ''
+   
+    studentFile = open("student.txt", "r")  # Open "student.txt" in read mode
+    counter = 1
+    for students in studentFile:  #'students' are the lines in "student.txt" file
+        order = students.split("|")  #the lines are then split into variables where there are pipe symbol (|)
+        ##['dave', 'kevin@gmail.com']
+        print("["+str(counter)+"]", order[0]) #this code prints a number and order[0] which is the student names
+        counter += 1
+
+
+    ## loop through orders
+    for students in studentFile:
+        order = students.split("|")
+        if order[0] == inputName:
+            loggedinAs = 'student'
+            studentKey = f'{order[0]}'
+            ###studentMenu()
+        
+        else:
+            print("Student name was not found. Please try again")
+            studentLogin()
+
+    studentFile.close()
+    ###   check if order[0] == inputName or check if order.name === inputName
+    ###   if yes:
+    ###       loggedinAs = 'student'
+    ###       studentMenu()
+    ###   else:
+    ###      ...
+    ###   
+            
+def studentMenu():
+    global loggedinAs
+    print("\nWelcome to Student Menu\n" + "-" * 25)
+    inp = 10
+    while (inp < 0 or inp >4):  #Infinite loop, unless user inputs value 0-4
+        inp = int(input("Select a Student Menu: \n0. Log Out\n1. Pay tuition fees\n2. Update their information\n3. Check schedule of classes\n"))
+    if inp == 0:
+        loggedinAs = ''
+    elif inp == 1:
+        pass
+        ##studentPayFee()
+    elif inp == 2:
+        pass
+        ##studentUpdateInformation()
+    elif inp == 3:
+        pass
+        ##studentCheckSchedule()
+
+def studentUpdateInformation():
+    global line
     studentFile = open("student.txt", "r")  # Open "student.txt" in read mode
     counter = 1
     for students in studentFile:  #'students' are the lines in "student.txt" file
         order = students.split("|")  #the lines are then split into variables where there are pipe symbol (|)
         print("["+str(counter)+"]", order[0])  #this code prints a number and order[0] which is the student names
         counter += 1
-    studentFile.close()
+    
     line = int(input("Select a student number : "))  #input for student list index
 
     studentData = ["name", "IC/Passport",  "email",     #studentData array to store student information
                    "phoneNum", "address", "level", 0, "subjects", 25000]
-    studentFile = open("student.txt", "r")
-    studentFileLine = studentFile.readlines()           #studentFile.readlines() turns "student.txt" into a list containing each lines
-   
-    studentFileLine[line-1] = studentData[0]+"|"+studentData[1]+"|"+studentData[2]+"|"+studentData[3]+"|"+studentData[4]+"|"+studentData[5]+"|"+str(studentData[6])+"|"+studentData[7]+"\n"
-    #The above sets the studentData with the correct index for the selected student, studentData are read from the readlines function, but the new subject is replaced with 'newSubjects' variable
-
-    studentFile = open("student.txt", "w")  #Open "student.txt" in write mode (overwriting the whole file)
-    studentFile.writelines(studentFileLine)  #but instead of overwriting the whole file, since writelines function is used, it only overwrites a whole line
-    studentFile.close()
     
-    print("\nStudent record successfully saved~\n\nReturning to Staff Menu")
-    staffMenu()
+    counter = 0
+    for students in studentFile:
+        order = students.split("|")
+        if order[0] == studentKey:
+            studentData[counter] == order[counter]
+            print(studentData[counter])
+        counter += 1
+
+    
 
 
+def studentPayFee():
+    pass
+def studentCheckSchedule():
+    pass
+
+def tutorMenu():
+    global loggedinAs
+    print("\nWelcome to Tutor Menu\n" + "-" * 25)
+    inp = 10
+    while (inp < 0 or inp >4):  #Infinite loop, unless user inputs value 0-4
+        inp = int(input("Select a Student Menu: \n0. Log Out\n1. Add class information\n2. Update class information\n3. View Profiles of students\n"))
+    if inp == 0:
+        loggedinAs = ''
+    elif inp == 1:
+        pass
+        ##tutorAddClassInformation()
+    elif inp == 2:
+        pass
+        ##tutorUpdateClassInformation()
+    elif inp == 3:
+        pass
+        ##ViewProfilesOfStudents()
+
+
+
+
+   
+
+def main():
+    running = True
+    while running:
+        print("\nMain Menu\n"+"-"*9)
+        inp = int(input("Enter a number: 0. EXIT PROGRAM\n1. Staff Login\n2. Student Login\n3. Tutor Login\n"))
+        
+        if inp == 1:
+            if loggedinAs == 'staff':
+                staffMenu()
+            else:
+                staffLogin()
+        elif inp == 0:
+            print("Thank you for using the program")
+            running = False
+        elif inp == 2:
+            if loggedinAs == 'student':
+                studentMenu()
+            else:
+                studentLogin()
+            pass
+            ##studentLogin()
+        elif inp == 3:
+            pass
+            ##tutorLogin()
+        
+
+main()
